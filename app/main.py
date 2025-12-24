@@ -5,7 +5,7 @@ from app.core.config import settings
 
 from contextlib import asynccontextmanager
 
-from app.core.models import db_helper, Base
+from app.models import db_helper, Base
 from app.api import router as api_roter
 
 
