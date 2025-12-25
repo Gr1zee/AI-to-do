@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.api_v1.endpoints.users import get_all_users
+from app.api.api_v1.crud.users import get_all_users
 from app.models import db_helper
 from app.schemas.user import UserRead, UserCreate
 from typing import Annotated
-from app.api.api_v1.endpoints.users import create_user as create_one_user
+from app.api.api_v1.crud.users import create_user as create_one_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
