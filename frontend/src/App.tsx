@@ -4,7 +4,7 @@ import { ProtectedRoute } from "./context/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
-import { ProjectPage } from "./pages/ProjectPage";
+import { ProjectDetailPage } from "./pages/ProjectDetailPage";
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
             path="/project/:projectId"
             element={
               <ProtectedRoute>
-                <ProjectPage />
+                <ProjectDetailPage />
               </ProtectedRoute>
             }
           />

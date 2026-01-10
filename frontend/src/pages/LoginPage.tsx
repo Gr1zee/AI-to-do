@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { LayoutDashboard, ArrowRight } from "lucide-react"; // Иконки
 import { useAuth } from "../context/AuthContext";
-import { Button, Input, Card } from "../components/UI";
+import { Button, Input } from "../components/UI";
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -13,57 +14,82 @@ export const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     try {
       await login(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Ошибка входа");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-2">AI To-Do</h1>
-        <p className="text-gray-600 mb-6">Manage your projects efficiently</p>
+    <div className="min-h-screen flex bg-white">
+      {/* Левая часть - Графика */}
+      <div className="hidden lg:flex w-1/2 bg-indigo-900 relative overflow-hidden items-center justify-center p-12">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 opacity-90" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+        
+        <div className="relative z-10 text-white max-w-lg">
+          <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20">
+            <LayoutDashboard className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold mb-6 leading-tight">Управляйте задачами с помощью AI</h1>
+          <p className="text-indigo-100 text-lg leading-relaxed">
+            Ваш умный помощник для продуктивности. Планируйте, выполняйте и анализируйте задачи быстрее, чем когда-либо.
+          </p>
+        </div>
+      </div>
 
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+      {/* Правая часть - Форма */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50">
+        <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-bold text-slate-900">С возвращением! 👋</h2>
+            <p className="text-slate-500 mt-2">Введите данные для входа в аккаунт</p>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          <Input
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e: any) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            required
-          />
-          <Input
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e: any) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-          />
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
+              ⚠️ {error}
+            </div>
+          )}
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full mb-4"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@company.com"
+              required
+            />
+            <div className="space-y-1">
+              <Input
+                label="Пароль"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+              <div className="flex justify-end">
+                <a href="#" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">Забыли пароль?</a>
+              </div>
+            </div>
 
-        <p className="text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-blue-600 hover:underline">
-            Register
-          </Link>
-        </p>
-      </Card>
+            <Button type="submit" className="w-full py-3" disabled={loading}>
+              {loading ? "Вход..." : "Войти"} <ArrowRight className="w-4 h-4" />
+            </Button>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-slate-500">
+            Нет аккаунта?{" "}
+            <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-700 hover:underline">
+              Создать бесплатно
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
