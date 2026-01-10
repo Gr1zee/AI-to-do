@@ -8,6 +8,8 @@ from typing import Annotated
 from app.api.api_v1.crud.projects import create_project as create_one_project
 from app.schemas.user import User
 from app.api.api_v1.crud.auth import get_current_auth_user
+from app.api.api_v1.crud.projects import delete_project as delete_one_project
+
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -28,3 +30,13 @@ async def create_project(
 ):
     project = await create_one_project(session=session, project_create=project_create, user_id=current_user.id)
     return project
+
+@router.delete("/{project_id}", response_model=dict)
+async def delete_project(
+    project_id: int,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_auth_user)
+):
+    if await delete_one_project(session=session, project_id=project_id, user_id=current_user.id) is None:
+        return {"detail": "Project not found"}
+    return {"detail": "Project deleted successfully."}

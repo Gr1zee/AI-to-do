@@ -17,3 +17,12 @@ async def create_project(session: AsyncSession, project_create: ProjectCreate, u
     await session.commit()
     await session.refresh(project)
     return project
+
+async def delete_project(session: AsyncSession, project_id: int, user_id: int) -> Project | None:
+    stmt = select(Project).where(Project.id == project_id, Project.user_id == user_id)
+    result = await session.scalars(stmt)
+    project = result.first()
+    if project:
+        await session.delete(project)
+        await session.commit()
+    return project
