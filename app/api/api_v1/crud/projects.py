@@ -5,8 +5,9 @@ from app.models import Project
 from app.schemas.project import ProjectCreate
 
 
-async def get_all_projects(session: AsyncSession) -> Sequence[Project]:
-    stmt = select(Project).order_by(Project.id)
+async def get_all_projects(session: AsyncSession, user_id: int) -> Sequence[Project]:
+    """Получить все проекты пользователя"""
+    stmt = select(Project).where(Project.user_id == user_id).order_by(Project.id)
     result = await session.scalars(stmt)
     return result.all()
 

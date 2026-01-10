@@ -17,8 +17,9 @@ router = APIRouter(prefix="/projects", tags=["Projects"])
 @router.get("", response_model=list[ProjectRead])
 async def get_projects(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    current_user: User = Depends(get_current_auth_user)
 ):
-    projects = await get_all_projects(session=session)
+    projects = await get_all_projects(session=session, user_id=current_user.id)
     return projects
 
 
