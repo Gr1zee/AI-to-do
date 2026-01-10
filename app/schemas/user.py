@@ -8,13 +8,13 @@ from pydantic import ConfigDict
 class UserBase(BaseModel):
     email: EmailStr
     name: str
-    hashed_password: bytes
 
     model_config = {"from_attributes": True}
 
 
 class UserCreate(UserBase):
-    pass
+    # accept plain password from client; server will hash it
+    password: str
 
 
 class UserRead(UserBase):

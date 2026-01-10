@@ -13,9 +13,17 @@ from app.api.api_v1.crud.auth import TokenInfo
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Annotated
+from app.models import db_helper
+
+
 @router.post("/login", response_model=TokenInfo)
-async def login(creds: dict = Depends(get_login_credentials)):
-    user = authenticate_user(creds.get("email"), creds.get("password"))
+async def login(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    creds: dict = Depends(get_login_credentials),
+):
+    user = await authenticate_user(session, creds.get("email"), creds.get("password"))
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

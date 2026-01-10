@@ -4,28 +4,27 @@ from jwt import InvalidTokenError
 from app.schemas.user import UserRead
 from app.auth import utils as auth
 from app.auth.utils import decode_jwt
+from typing import Annotated
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models import db_helper
+from app.api.api_v1.crud.users import get_user_by_email
 from fastapi.security import OAuth2PasswordBearer
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
-john = UserRead(
-    id=1,
-    email="123@gmail.com",
-    name="John Doe",
-    hashed_password=auth.hash_password("123")
-)
-
-users_db = {
-    john.email: john
-}
-
 class TokenInfo(BaseModel):
     access_token: str
     token_type: str
 
-def validate_auth_user(email: str = Form(), password: str = Form()) -> UserRead:
-    user = users_db.get(email)
+
+async def validate_auth_user(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    email: str = Form(),
+    password: str = Form(),
+) -> UserRead:
+    """Validate credentials against the database and return a `UserRead` schema on success."""
+    user = await get_user_by_email(session, email)
     unaouthorized_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid email or password",
@@ -35,7 +34,7 @@ def validate_auth_user(email: str = Form(), password: str = Form()) -> UserRead:
         raise unaouthorized_exception
     if not auth.validate_password(password, user.hashed_password):
         raise unaouthorized_exception
-    return user
+    return UserRead.model_validate(user)
 
 def get_current_token_payload(token: str = Depends(oauth2_scheme)) -> dict:
     try:
@@ -49,7 +48,10 @@ def get_current_token_payload(token: str = Depends(oauth2_scheme)) -> dict:
     return decoded_token
 
 
-def get_current_auth_user(payload: dict = Depends(get_current_token_payload)) -> UserRead:
+async def get_current_auth_user(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    payload: dict = Depends(get_current_token_payload),
+) -> UserRead:
     email: str | None = payload.get("email")
     if not email:
         raise HTTPException(
@@ -57,31 +59,30 @@ def get_current_auth_user(payload: dict = Depends(get_current_token_payload)) ->
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = users_db.get(email)
+    user = await get_user_by_email(session, email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return UserRead.model_validate(user)
 
 
-def authenticate_user(email: str, password: str) -> UserRead | None:
-    user = users_db.get(email)
+async def authenticate_user(session: AsyncSession, email: str, password: str) -> UserRead | None:
+    """Return authenticated user as `UserRead` or None."""
+    user = await get_user_by_email(session, email)
     if not user:
         return None
     if not auth.validate_password(password, user.hashed_password):
         return None
-    return user
+    return UserRead.model_validate(user)
 
 
 async def get_login_credentials(request: Request, email: str | None = Form(None), password: str | None = Form(None)) -> dict:
     """Accepts form with (email,password) or form with (username,password) (OAuth2) or JSON body {email,password}."""
-    # prefer conventional form fields
     if email and password:
         return {"email": email, "password": password}
-    # try JSON body
     try:
         data = await request.json()
         if isinstance(data, dict) and data.get("email") and data.get("password"):

@@ -41,10 +41,15 @@ def decode_jwt(
     payload = jwt.decode(token, public_key, algorithms=algorithms)
     return payload
 
-def hash_password(password: str) -> bytes:
+def hash_password(password: str) -> str:
+    """Hash a plain password and return a UTF-8 string safe for DB storage."""
     salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed
+    hashed = bcrypt.hashpw(password.encode("utf-8"), salt)
+    return hashed.decode("utf-8")
 
-def validate_password(password: str, hashed_pwd: bytes) -> bool:
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_pwd)
+
+def validate_password(password: str, hashed_pwd: str | bytes) -> bool:
+    """Validate a plain password against a hashed password stored as str or bytes."""
+    if isinstance(hashed_pwd, str):
+        hashed_pwd = hashed_pwd.encode("utf-8")
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_pwd)

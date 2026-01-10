@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class User(Base):
     __tablename__ = "users"
-    email: Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
