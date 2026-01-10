@@ -11,8 +11,8 @@ async def get_all_projects(session: AsyncSession) -> Sequence[Project]:
     return result.all()
 
 
-async def create_project(session: AsyncSession, project_create: ProjectCreate) -> Project:
-    project = Project(**project_create.model_dump())
+async def create_project(session: AsyncSession, project_create: ProjectCreate, user_id: int) -> Project:
+    project = Project(**project_create.model_dump(), user_id=user_id)
     session.add(project)
     await session.commit()
     await session.refresh(project)

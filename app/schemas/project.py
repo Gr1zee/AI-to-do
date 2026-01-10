@@ -4,7 +4,6 @@ from typing import Optional
 
 
 class ProjectBase(BaseModel):
-    user_id: int
     name: str
     description: str | None
 
@@ -20,5 +19,6 @@ class ProjectRead(ProjectBase):
 
 
 class Project(ProjectBase):
+    user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
