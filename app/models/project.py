@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.task import Task
 
 
 class Project(Base):
@@ -21,3 +22,4 @@ class Project(Base):
 
     # relationships
     user: Mapped["User"] = relationship("User", back_populates="projects")
+    tasks: Mapped[list["Task"]] = relationship("Task", back_populates="project", cascade="all, delete-orphan")

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { projectsApi } from "../api";
 import { Button, Card } from "../components/UI";
+import { formatDate } from "../utils/dateUtils";
 
 interface Project {
   id: number;
@@ -62,6 +63,10 @@ export const DashboardPage = () => {
     navigate("/login");
   };
 
+  const handleOpenProject = (projectId: number) => {
+    navigate(`/project/${projectId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -100,11 +105,17 @@ export const DashboardPage = () => {
                   <h3 className="text-xl font-bold mb-2">{project.name}</h3>
                   <p className="text-gray-600 mb-4">{project.description}</p>
                   <p className="text-sm text-gray-500">
-                    Created {new Date(project.created_at).toLocaleDateString()}
+                    Created {formatDate(project.created_at)}
                   </p>
                 </div>
                 <div className="flex gap-2 mt-4">
-                  <Button variant="secondary" className="flex-1">Edit</Button>
+                  <Button 
+                    variant="secondary" 
+                    className="flex-1"
+                    onClick={() => handleOpenProject(project.id)}
+                  >
+                    Open
+                  </Button>
                   <Button
                     variant="danger"
                     className="flex-1"

@@ -48,6 +48,13 @@ export const apiClient = {
     });
   },
 
+  patch(endpoint: string, body: any) {
+    return this.request(endpoint, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  },
+
   delete(endpoint: string) {
     return this.request(endpoint, { method: "DELETE" });
   },
@@ -82,6 +89,24 @@ export const projectsApi = {
 
   delete(id: number) {
     return apiClient.delete(`/projects/${id}`);
+  },
+};
+
+export const tasksApi = {
+  getAll(projectId: number) {
+    return apiClient.get(`/projects/${projectId}/tasks`);
+  },
+
+  create(projectId: number, task: { title: string; description?: string; status?: string; priority?: string; deadline?: string }) {
+    return apiClient.post(`/projects/${projectId}/tasks`, task);
+  },
+
+  update(projectId: number, taskId: number, updates: any) {
+    return apiClient.patch(`/projects/${projectId}/tasks/${taskId}`, updates);
+  },
+
+  delete(projectId: number, taskId: number) {
+    return apiClient.delete(`/projects/${projectId}/tasks/${taskId}`);
   },
 };
 
