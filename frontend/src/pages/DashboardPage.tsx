@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Search, FolderKanban, LogOut, Trash2, Sparkles } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { projectsApi } from "../api";
-import { Button, Card, Input } from "../components/UI";
+import { Button, Card, Input, ThemeToggle } from "../components/UI";
 import { formatDate } from "../utils/dateUtils";
 
 interface Project {
@@ -67,21 +67,22 @@ export const DashboardPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
       {/* Навигация */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-2">
               <div className="bg-indigo-600 p-2 rounded-lg">
                 <FolderKanban className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-xl text-slate-800">AI To-Do</span>
+              <span className="font-bold text-xl text-slate-800 dark:text-white">AI To-Do</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-slate-500 hidden sm:block">
+              <span className="text-sm text-slate-500 dark:text-slate-400 hidden sm:block">
                 {user?.email}
               </span>
+              <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={() => { logout(); navigate("/login"); }}>
                 <LogOut className="w-4 h-4 mr-2" /> Выйти
               </Button>
@@ -93,10 +94,10 @@ export const DashboardPage = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Приветственный блок */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
             Привет, {user?.name || "Пользователь"}! 👋
           </h1>
-          <p className="text-slate-500 mt-2">Вот что происходит с твоими проектами сегодня.</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Вот что происходит с твоими проектами сегодня.</p>
         </div>
 
         {/* Панель действий */}
@@ -108,7 +109,7 @@ export const DashboardPage = () => {
               placeholder="Поиск проектов..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm text-slate-900 dark:text-white placeholder:text-slate-400"
             />
           </div>
           <Button onClick={() => setShowModal(true)}>
@@ -122,14 +123,14 @@ export const DashboardPage = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div>
           </div>
         ) : filteredProjects.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-50 rounded-full mb-4">
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-300 dark:border-slate-600">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full mb-4">
               <FolderKanban className="w-8 h-8 text-slate-400" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900">
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white">
               {searchTerm ? "Ничего не найдено" : "Проектов пока нет"}
             </h3>
-            <p className="text-slate-500 mt-1 mb-6">
+            <p className="text-slate-500 dark:text-slate-400 mt-1 mb-6">
               {searchTerm ? "Попробуйте изменить поисковый запрос." : "Создайте свой первый проект, чтобы начать."}
             </p>
             {!searchTerm && <Button onClick={() => setShowModal(true)}>Создать проект</Button>}
@@ -140,19 +141,19 @@ export const DashboardPage = () => {
               <div
                 key={project.id}
                 onClick={() => navigate(`/project/${project.id}`)}
-                className="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden"
+                className="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="flex justify-between items-start mb-4">
-                  <div className="bg-indigo-50 p-3 rounded-xl group-hover:bg-indigo-100 transition-colors">
-                    <FolderKanban className="w-6 h-6 text-indigo-600" />
+                  <div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
+                    <FolderKanban className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <button
                       onClick={(e) => handleDeleteProject(e, project.id)}
-                      className="text-slate-300 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                      className="text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-all opacity-0 group-hover:opacity-100"
                       title="Удалить"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -160,16 +161,16 @@ export const DashboardPage = () => {
                   </div>
                 </div>
                 
-                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   {project.name}
                 </h3>
-                <p className="text-slate-500 text-sm line-clamp-2 mb-4 h-10">
+                <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mb-4 h-10">
                   {project.description}
                 </p>
                 
-                <div className="border-t border-slate-100 pt-4 flex justify-between items-center text-xs text-slate-400">
+                <div className="border-t border-slate-100 dark:border-slate-700 pt-4 flex justify-between items-center text-xs text-slate-400">
                   <span>{formatDate(project.created_at)}</span>
-                  <span className="font-medium text-indigo-600 group-hover:translate-x-1 transition-transform">
+                  <span className="font-medium text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
                     Открыть →
                   </span>
                 </div>
@@ -183,7 +184,7 @@ export const DashboardPage = () => {
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
           <Card className="w-full max-w-lg p-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Новый проект</h2>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Новый проект</h2>
             <form onSubmit={handleCreateProject} className="space-y-4">
               <Input
                 label="Название"
@@ -194,12 +195,12 @@ export const DashboardPage = () => {
                 autoFocus
               />
               <div>
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1 block">Описание</label>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 mb-1 block">Описание</label>
                 <textarea
                   placeholder="Краткое описание проекта..."
                   value={newProject.description}
                   onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all h-24 resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all h-24 resize-none"
                   required
                 />
               </div>
