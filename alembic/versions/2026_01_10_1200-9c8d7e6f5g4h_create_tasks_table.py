@@ -28,14 +28,24 @@ def upgrade() -> None:
         sa.Column("project_id", sa.Integer(), nullable=False),
         sa.Column("title", sa.String(length=100), nullable=False),
         sa.Column("description", sa.String(length=250), nullable=True),
-        sa.Column("status", sa.String(length=50), nullable=False, server_default="pending"),
-        sa.Column("priority", sa.String(length=50), nullable=False, server_default="normal"),
+        sa.Column(
+            "status", sa.String(length=50), nullable=False, server_default="pending"
+        ),
+        sa.Column(
+            "priority", sa.String(length=50), nullable=False, server_default="normal"
+        ),
         sa.Column("deadline", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
-        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ),
-        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ),
+        sa.ForeignKeyConstraint(
+            ["project_id"],
+            ["projects.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["user_id"],
+            ["users.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
 

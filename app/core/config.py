@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from pydantic import PostgresDsn
 from pathlib import Path
 
+
 class RunConfig(BaseModel):
     host: str = "0.0.0.0"
     port: int = 8000
@@ -26,11 +27,13 @@ class DataBaseConfig(BaseModel):
         "pk": "pk_%(table_name)s",
     }
 
+
 class AuthJWT(BaseModel):
     private_key_path: Path = "jwt-private.pem"
     public_key_path: Path = "jwt-public.pem"
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 60
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(

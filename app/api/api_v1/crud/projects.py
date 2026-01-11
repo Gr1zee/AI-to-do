@@ -12,14 +12,19 @@ async def get_all_projects(session: AsyncSession, user_id: int) -> Sequence[Proj
     return result.all()
 
 
-async def create_project(session: AsyncSession, project_create: ProjectCreate, user_id: int) -> Project:
+async def create_project(
+    session: AsyncSession, project_create: ProjectCreate, user_id: int
+) -> Project:
     project = Project(**project_create.model_dump(), user_id=user_id)
     session.add(project)
     await session.commit()
     await session.refresh(project)
     return project
 
-async def delete_project(session: AsyncSession, project_id: int, user_id: int) -> Project | None:
+
+async def delete_project(
+    session: AsyncSession, project_id: int, user_id: int
+) -> Project | None:
     stmt = select(Project).where(Project.id == project_id, Project.user_id == user_id)
     result = await session.scalars(stmt)
     project = result.first()
@@ -29,7 +34,9 @@ async def delete_project(session: AsyncSession, project_id: int, user_id: int) -
     return project
 
 
-async def get_project_by_id(session: AsyncSession, project_id: int, user_id: int) -> Project | None:
+async def get_project_by_id(
+    session: AsyncSession, project_id: int, user_id: int
+) -> Project | None:
     """Получить проект по ID с проверкой прав доступа"""
     stmt = select(Project).where(Project.id == project_id, Project.user_id == user_id)
     result = await session.scalars(stmt)

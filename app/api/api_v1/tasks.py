@@ -23,7 +23,9 @@ async def get_current_project(
     current_user: User,
 ) -> int:
     """Получить текущий проект с проверкой прав доступа"""
-    project = await get_project_by_id(session=session, project_id=project_id, user_id=current_user.id)
+    project = await get_project_by_id(
+        session=session, project_id=project_id, user_id=current_user.id
+    )
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     return project_id
@@ -37,7 +39,9 @@ async def get_tasks(
 ):
     """Получить все задачи проекта"""
     # Проверяем, что проект принадлежит пользователю
-    await get_current_project(project_id=project_id, session=session, current_user=current_user)
+    await get_current_project(
+        project_id=project_id, session=session, current_user=current_user
+    )
     tasks = await get_project_tasks(session=session, project_id=project_id)
     return tasks
 
@@ -51,8 +55,15 @@ async def create_task_endpoint(
 ):
     """Создать новую задачу в проекте"""
     # Проверяем, что проект принадлежит пользователю
-    await get_current_project(project_id=project_id, session=session, current_user=current_user)
-    task = await create_task(session=session, task_create=task_create, user_id=current_user.id, project_id=project_id)
+    await get_current_project(
+        project_id=project_id, session=session, current_user=current_user
+    )
+    task = await create_task(
+        session=session,
+        task_create=task_create,
+        user_id=current_user.id,
+        project_id=project_id,
+    )
     return task
 
 
@@ -65,8 +76,13 @@ async def delete_task_endpoint(
 ):
     """Удалить задачу"""
     # Проверяем, что проект принадлежит пользователю
-    await get_current_project(project_id=project_id, session=session, current_user=current_user)
-    if await delete_task(session=session, task_id=task_id, user_id=current_user.id) is None:
+    await get_current_project(
+        project_id=project_id, session=session, current_user=current_user
+    )
+    if (
+        await delete_task(session=session, task_id=task_id, user_id=current_user.id)
+        is None
+    ):
         raise HTTPException(status_code=404, detail="Task not found")
     return {"detail": "Task deleted successfully"}
 
@@ -81,12 +97,14 @@ async def update_task_endpoint(
 ):
     """Обновить задачу"""
     # Проверяем, что проект принадлежит пользователю
-    await get_current_project(project_id=project_id, session=session, current_user=current_user)
+    await get_current_project(
+        project_id=project_id, session=session, current_user=current_user
+    )
     updated_task = await update_task(
-        session=session, 
-        task_id=task_id, 
+        session=session,
+        task_id=task_id,
         user_id=current_user.id,
-        task_update=task_update.model_dump(exclude_unset=True)
+        task_update=task_update.model_dump(exclude_unset=True),
     )
     if not updated_task:
         raise HTTPException(status_code=404, detail="Task not found")

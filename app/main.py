@@ -6,7 +6,7 @@ from app.core.config import settings
 
 from contextlib import asynccontextmanager
 
-from app.models import db_helper, Base
+from app.models import db_helper
 from app.api import router as api_roter
 
 
@@ -23,7 +23,10 @@ app = FastAPI(lifespan=lifespan)
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # frontend dev servers
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],  # frontend dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

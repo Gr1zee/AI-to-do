@@ -4,20 +4,21 @@ from app.core.config import settings
 from datetime import datetime, timedelta
 from pathlib import Path
 
+
 def encode_jwt(
     payload: dict,
     key: str | None = None,
     algorithm: str = settings.auth_jwt.algorithm,
     expire_minutes: int = settings.auth_jwt.access_token_expire_minutes,
-    expire_timedelta: timedelta | None = None
+    expire_timedelta: timedelta | None = None,
 ) -> str:
     if key is None:
         # support either Path or str values in settings
         key = Path(settings.auth_jwt.private_key_path).read_text()
     to_encode = payload.copy()
     # ensure 'sub' claim is a string (some JWT libs require this)
-    if 'sub' in to_encode and to_encode['sub'] is not None:
-        to_encode['sub'] = str(to_encode['sub'])
+    if "sub" in to_encode and to_encode["sub"] is not None:
+        to_encode["sub"] = str(to_encode["sub"])
     now = datetime.utcnow()
     if expire_timedelta:
         expire = now + expire_timedelta
@@ -32,7 +33,7 @@ def encode_jwt(
 def decode_jwt(
     token: str | bytes,
     public_key: str | None = None,
-    algorithms: list[str] | None = None
+    algorithms: list[str] | None = None,
 ) -> dict:
     if public_key is None:
         public_key = Path(settings.auth_jwt.public_key_path).read_text()
@@ -40,6 +41,7 @@ def decode_jwt(
         algorithms = [settings.auth_jwt.algorithm]
     payload = jwt.decode(token, public_key, algorithms=algorithms)
     return payload
+
 
 def hash_password(password: str) -> str:
     """Hash a plain password and return a UTF-8 string safe for DB storage."""

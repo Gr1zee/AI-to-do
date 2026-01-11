@@ -33,7 +33,7 @@ class User(UserBase):
     model_config = ConfigDict(strict=True)
 
     email: EmailStr
-    name: str 
+    name: str
     hashed_password: bytes
     projects: Optional[List[ProjectRead]] = None
     created_at: datetime

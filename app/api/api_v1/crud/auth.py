@@ -13,6 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
+
 class TokenInfo(BaseModel):
     access_token: str
     token_type: str
@@ -35,6 +36,7 @@ async def validate_auth_user(
     if not auth.validate_password(password, user.hashed_password):
         raise unaouthorized_exception
     return UserRead.model_validate(user)
+
 
 def get_current_token_payload(token: str = Depends(oauth2_scheme)) -> dict:
     try:
@@ -69,7 +71,9 @@ async def get_current_auth_user(
     return UserRead.model_validate(user)
 
 
-async def authenticate_user(session: AsyncSession, email: str, password: str) -> UserRead | None:
+async def authenticate_user(
+    session: AsyncSession, email: str, password: str
+) -> UserRead | None:
     """Return authenticated user as `UserRead` or None."""
     user = await get_user_by_email(session, email)
     if not user:
@@ -79,7 +83,9 @@ async def authenticate_user(session: AsyncSession, email: str, password: str) ->
     return UserRead.model_validate(user)
 
 
-async def get_login_credentials(request: Request, email: str | None = Form(None), password: str | None = Form(None)) -> dict:
+async def get_login_credentials(
+    request: Request, email: str | None = Form(None), password: str | None = Form(None)
+) -> dict:
     """Accepts form with (email,password) or form with (username,password) (OAuth2) or JSON body {email,password}."""
     if email and password:
         return {"email": email, "password": password}
@@ -97,4 +103,6 @@ async def get_login_credentials(request: Request, email: str | None = Form(None)
             return {"email": username, "password": pwd}
     except Exception:
         pass
-    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Missing credentials")
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Missing credentials"
+    )

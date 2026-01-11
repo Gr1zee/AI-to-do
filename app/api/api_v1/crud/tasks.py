@@ -18,7 +18,9 @@ async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
     return result.all()
 
 
-async def create_task(session: AsyncSession, task_create: TaskCreate, user_id: int, project_id: int) -> Task:
+async def create_task(
+    session: AsyncSession, task_create: TaskCreate, user_id: int, project_id: int
+) -> Task:
     task = Task(**task_create.model_dump(), user_id=user_id, project_id=project_id)
     session.add(task)
     await session.commit()
@@ -37,7 +39,9 @@ async def delete_task(session: AsyncSession, task_id: int, user_id: int) -> Task
     return task
 
 
-async def update_task(session: AsyncSession, task_id: int, user_id: int, task_update: dict) -> Task | None:
+async def update_task(
+    session: AsyncSession, task_id: int, user_id: int, task_update: dict
+) -> Task | None:
     """Обновить задачу с проверкой прав доступа"""
     stmt = select(Task).where(Task.id == task_id, Task.user_id == user_id)
     result = await session.scalars(stmt)

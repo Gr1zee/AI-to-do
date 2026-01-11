@@ -30,11 +30,7 @@ async def login(
             detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    jwt_payload = {
-        "sub": str(user.id),
-        "name": user.name,
-        "email": user.email
-    }
+    jwt_payload = {"sub": str(user.id), "name": user.name, "email": user.email}
     token = encode_jwt(jwt_payload)
     return TokenInfo(access_token=token, token_type="Bearer")
 
