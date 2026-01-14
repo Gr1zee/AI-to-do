@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
+    groq_api: str
 
     auth_jwt: AuthJWT = AuthJWT()
 
