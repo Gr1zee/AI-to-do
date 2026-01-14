@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.models.project import Project
     from app.models.task import Task
+    from app.models.project_members import ProjectMember
 
 
 class User(Base):
@@ -19,6 +20,9 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    # relarionships
+    # relationships
     projects: Mapped[List["Project"]] = relationship("Project", back_populates="user")
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="user")
+    project_memberships: Mapped[List["ProjectMember"]] = relationship(
+        "ProjectMember", back_populates="user", cascade="all, delete-orphan"
+    )

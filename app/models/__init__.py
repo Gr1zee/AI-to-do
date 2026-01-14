@@ -3,5 +3,6 @@ from app.models.base import Base
 from app.models.user import User
 from app.models.project import Project
 from app.models.task import Task
+from app.models.project_members import ProjectMember, ProjectRole
 
-__all__ = ["db_helper", "Base", "User", "Project", "Task"]
+__all__ = ["db_helper", "Base", "User", "Project", "Task", "ProjectMember", "ProjectRole"]
