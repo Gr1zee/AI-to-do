@@ -29,8 +29,8 @@ class DataBaseConfig(BaseModel):
 
 
 class AuthJWT(BaseModel):
-    private_key_path: Path = "jwt-private.pem"
-    public_key_path: Path = "jwt-public.pem"
+    private_key_path: Path = "jwt-private.pem" # type: ignore
+    public_key_path: Path = "jwt-public.pem" # type: ignore
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 60
 
@@ -50,4 +50,4 @@ class Settings(BaseSettings):
     auth_jwt: AuthJWT = AuthJWT()
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

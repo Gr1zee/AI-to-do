@@ -1,13 +1,25 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from typing import Sequence
-from app.models import Project
+from app.models import Project, ProjectMember
 from app.schemas.project import ProjectCreate
 
 
 async def get_all_projects(session: AsyncSession, user_id: int) -> Sequence[Project]:
-    """Получить все проекты пользователя"""
-    stmt = select(Project).where(Project.user_id == user_id).order_by(Project.id)
+    """Получить все проекты пользователя (свои + где участник)"""
+    stmt = (
+        select(Project)
+        .where(
+            or_(
+                Project.user_id == user_id,  # владелец
+                Project.id.in_(  # участник
+                    select(ProjectMember.project_id)
+                    .where(ProjectMember.user_id == user_id)
+                )
+            )
+        )
+        .order_by(Project.id)
+    )
     result = await session.scalars(stmt)
     return result.all()
 

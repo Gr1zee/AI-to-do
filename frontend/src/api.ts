@@ -4,7 +4,7 @@ export const apiClient = {
   async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem("token");
-    
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -107,6 +107,24 @@ export const tasksApi = {
 
   delete(projectId: number, taskId: number) {
     return apiClient.delete(`/projects/${projectId}/tasks/${taskId}`);
+  },
+};
+
+export const membersApi = {
+  getAll(projectId: number) {
+    return apiClient.get(`/projects/${projectId}/members`);
+  },
+
+  add(projectId: number, email: string, role: "editor" | "viewer") {
+    return apiClient.post(`/projects/${projectId}/members`, { email, role });
+  },
+
+  updateRole(projectId: number, userId: number, role: "editor" | "viewer") {
+    return apiClient.patch(`/projects/${projectId}/members/${userId}`, { role });
+  },
+
+  remove(projectId: number, userId: number) {
+    return apiClient.delete(`/projects/${projectId}/members/${userId}`);
   },
 };
 

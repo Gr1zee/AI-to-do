@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from pydantic import EmailStr
+from app.schemas.enums import ProjectRole
 
 
 class ProjectBase(BaseModel):
@@ -16,9 +18,34 @@ class ProjectCreate(ProjectBase):
 
 class ProjectRead(ProjectBase):
     id: int
+    user_id: int
 
 
 class Project(ProjectBase):
     user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+class ProjectMemberCreate(BaseModel):
+    email: EmailStr
+    role: ProjectRole
+
+    model_config = {"from_attributes": True}
+
+class ProjectMemberRead(BaseModel):
+    id: int
+    email: EmailStr
+    role: ProjectRole
+    added_at: datetime
+
+    model_config = {"from_attributes": True}
+
+class ProjectMemberUpdate(BaseModel):
+    role: ProjectRole
+
+    model_config = {"from_attributes": True}
+
+class ProjectMemberDelete(BaseModel):
+    email: EmailStr
+
+    model_config = {"from_attributes": True}

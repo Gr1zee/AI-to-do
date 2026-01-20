@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { authApi } from "../api";
 
 interface User {
@@ -23,7 +23,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem("token")
   );
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Автозагрузка профиля при наличии токена
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (token) {
+        try {
+          const profile = await authApi.getProfile();
+          setUser(profile);
+        } catch (error) {
+          // Токен невалидный — очищаем
+          setToken(null);
+          localStorage.removeItem("token");
+        }
+      }
+      setLoading(false);
+    };
+    loadProfile();
+  }, [token]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
