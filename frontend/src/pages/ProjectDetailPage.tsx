@@ -24,6 +24,7 @@ interface Project {
   name: string;
   description: string;
   user_id?: number;
+  owner_email?: string;
 }
 
 interface Member {
@@ -351,8 +352,8 @@ export const ProjectDetailPage = () => {
                             {/* Дедлайн */}
                             {deadlineInfo && (
                               <span className={`text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 ${deadlineInfo.isOverdue
-                                  ? "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/40"
-                                  : "text-slate-500 bg-slate-100 dark:text-slate-400 dark:bg-slate-700"
+                                ? "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/40"
+                                : "text-slate-500 bg-slate-100 dark:text-slate-400 dark:bg-slate-700"
                                 }`}>
                                 <Calendar className="w-3 h-3" />
                                 {deadlineInfo.text}
@@ -526,7 +527,7 @@ export const ProjectDetailPage = () => {
                     <Shield className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900 dark:text-white">{user?.email}</p>
+                    <p className="font-medium text-slate-900 dark:text-white">{project?.owner_email || user?.email}</p>
                     <p className="text-xs text-indigo-600 dark:text-indigo-400">Владелец</p>
                   </div>
                 </div>
@@ -540,8 +541,8 @@ export const ProjectDetailPage = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${member.role === "editor"
-                        ? "bg-blue-100 dark:bg-blue-900"
-                        : "bg-slate-100 dark:bg-slate-700"
+                      ? "bg-blue-100 dark:bg-blue-900"
+                      : "bg-slate-100 dark:bg-slate-700"
                       }`}>
                       {member.role === "editor"
                         ? <Edit3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -551,8 +552,8 @@ export const ProjectDetailPage = () => {
                     <div>
                       <p className="font-medium text-slate-900 dark:text-white">{member.email}</p>
                       <p className={`text-xs ${member.role === "editor"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-slate-500 dark:text-slate-400"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-slate-500 dark:text-slate-400"
                         }`}>
                         {member.role === "editor" ? "Редактор" : "Только просмотр"}
                       </p>

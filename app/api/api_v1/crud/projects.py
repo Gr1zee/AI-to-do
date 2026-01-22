@@ -49,7 +49,19 @@ async def delete_project(
 async def get_project_by_id(
     session: AsyncSession, project_id: int, user_id: int
 ) -> Project | None:
-    """Получить проект по ID с проверкой прав доступа"""
-    stmt = select(Project).where(Project.id == project_id, Project.user_id == user_id)
+    """Получить проект по ID с проверкой прав доступа (владелец или участник)"""
+    stmt = (
+        select(Project)
+        .where(
+            Project.id == project_id,
+            or_(
+                Project.user_id == user_id,  # владелец
+                Project.id.in_(  # участник
+                    select(ProjectMember.project_id)
+                    .where(ProjectMember.user_id == user_id)
+                )
+            )
+        )
+    )
     result = await session.scalars(stmt)
     return result.first()

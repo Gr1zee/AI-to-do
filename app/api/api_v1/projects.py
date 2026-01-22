@@ -41,7 +41,19 @@ async def get_projects(
 ):
     """Получить все проекты пользователя (свои + где участник)"""
     projects = await get_all_projects(session=session, user_id=current_user.id)
-    return projects
+    
+    # Добавляем email владельца для каждого проекта
+    result = []
+    for project in projects:
+        owner = await get_user_by_id(session, project.user_id)
+        result.append({
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "user_id": project.user_id,
+            "owner_email": owner.email if owner else None,
+        })
+    return result
 
 
 @router.post("", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)
@@ -142,13 +154,14 @@ async def list_project_members(
     
     members = await get_members_crud(session=session, project_id=project_id)
     
-    # Преобразуем в формат ответа с email
+    # Преобразуем в формат ответа с email и user_id
     result = []
     for member in members:
         # Загружаем user через relationship или отдельный запрос
         user = await get_user_by_id(session, member.user_id)
         result.append({
             "id": member.id,
+            "user_id": member.user_id,
             "email": user.email if user else "unknown",
             "role": member.role,
             "added_at": member.added_at,

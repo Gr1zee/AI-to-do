@@ -19,6 +19,7 @@ class ProjectCreate(ProjectBase):
 class ProjectRead(ProjectBase):
     id: int
     user_id: int
+    owner_email: str | None = None
 
 
 class Project(ProjectBase):
@@ -34,6 +35,7 @@ class ProjectMemberCreate(BaseModel):
 
 class ProjectMemberRead(BaseModel):
     id: int
+    user_id: int
     email: EmailStr
     role: ProjectRole
     added_at: datetime
