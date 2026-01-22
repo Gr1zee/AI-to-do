@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, FolderKanban, LogOut, Trash2, Sparkles, TrendingUp, CheckCircle2, Clock } from "lucide-react";
+import { Plus, Search, FolderKanban, LogOut, Trash2, Sparkles, TrendingUp, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { projectsApi } from "../api";
 import { Button, Card, Input, ThemeToggle, Logo } from "../components/UI";
@@ -33,6 +33,11 @@ export const DashboardPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newProject, setNewProject] = useState({ name: "", description: "" });
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    projectId: number | null;
+    projectName: string;
+  }>({ show: false, projectId: null, projectName: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,16 +67,21 @@ export const DashboardPage = () => {
     }
   };
 
-  const handleDeleteProject = async (e: React.MouseEvent, id: number) => {
+  const handleDeleteProject = (e: React.MouseEvent, project: Project) => {
     e.stopPropagation();
-    if (confirm("Вы уверены, что хотите удалить проект?")) {
+    setConfirmModal({ show: true, projectId: project.id, projectName: project.name });
+  };
+
+  const confirmDeleteProject = async () => {
+    if (confirmModal.projectId) {
       try {
-        await projectsApi.delete(id);
+        await projectsApi.delete(confirmModal.projectId);
         loadProjects();
       } catch (error) {
         console.error(error);
       }
     }
+    setConfirmModal({ show: false, projectId: null, projectName: "" });
   };
 
   const filteredProjects = projects.filter(p =>
@@ -207,7 +217,7 @@ export const DashboardPage = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={(e) => handleDeleteProject(e, project.id)}
+                        onClick={(e) => handleDeleteProject(e, project)}
                         className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-all opacity-0 group-hover:opacity-100"
                         title="Удалить"
                       >
@@ -277,6 +287,49 @@ export const DashboardPage = () => {
                 </Button>
               </div>
             </form>
+          </Card>
+        </div>
+      )}
+
+      {/* Модальное окно подтверждения удаления */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <Card className="w-full max-w-sm p-6 animate-slideUp">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-4">
+                <AlertTriangle className="w-8 h-8 text-rose-600 dark:text-rose-400" />
+              </div>
+
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                Удалить проект?
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
+                Вы собираетесь удалить проект
+              </p>
+              <p className="font-semibold text-slate-900 dark:text-white mb-4">
+                «{confirmModal.projectName}»
+              </p>
+              <p className="text-rose-500 dark:text-rose-400 text-xs mb-6">
+                Все задачи проекта будут удалены. Это действие нельзя отменить.
+              </p>
+
+              <div className="flex gap-3 w-full">
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={() => setConfirmModal({ show: false, projectId: null, projectName: "" })}
+                >
+                  Отмена
+                </Button>
+                <Button
+                  variant="danger"
+                  className="flex-1"
+                  onClick={confirmDeleteProject}
+                >
+                  <Trash2 className="w-4 h-4" /> Удалить
+                </Button>
+              </div>
+            </div>
           </Card>
         </div>
       )}
