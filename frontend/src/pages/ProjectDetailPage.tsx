@@ -130,6 +130,20 @@ export const ProjectDetailPage = () => {
 
   const isOwner = project?.user_id === user?.id;
 
+  // Вычисляем роль текущего пользователя
+  const getUserRole = (): { role: string; label: string; color: string } => {
+    if (isOwner) {
+      return { role: "owner", label: "Владелец", color: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300" };
+    }
+    const myMembership = members.find(m => m.user_id === user?.id);
+    if (myMembership?.role === "editor") {
+      return { role: "editor", label: "Редактор", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" };
+    }
+    return { role: "viewer", label: "Просмотр", color: "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300" };
+  };
+
+  const userRole = getUserRole();
+
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     setMemberError(null);
@@ -263,6 +277,9 @@ export const ProjectDetailPage = () => {
                   <FolderKanban className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-bold text-xl text-slate-800 dark:text-white">{project?.name || "Проект"}</span>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${userRole.color}`}>
+                  {userRole.label}
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-4">
