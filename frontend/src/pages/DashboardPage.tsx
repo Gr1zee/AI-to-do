@@ -30,6 +30,7 @@ export const DashboardPage = () => {
   const { user, logout } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [todayTasks, setTodayTasks] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [newProject, setNewProject] = useState({ name: "", description: "" });
@@ -42,6 +43,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     loadProjects();
+    loadTodayTasks();
   }, []);
 
   const loadProjects = async () => {
@@ -52,6 +54,15 @@ export const DashboardPage = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTodayTasks = async () => {
+    try {
+      const data = await (await import("../api")).tasksApi.getToday();
+      setTodayTasks(data || []);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -155,6 +166,26 @@ export const DashboardPage = () => {
             </div>
           ))}
         </div>
+
+        {/* Сегодняшние задачи */}
+        {todayTasks.length > 0 && (
+          <div className="mb-8 animate-slideUp">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">Сегодня</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {todayTasks.map((t, i) => (
+                <div key={t.id} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-slate-900 dark:text-white">{t.title}</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{projects.find(p => p.id === t.project_id)?.name || 'Проект'} • {t.priority}</p>
+                    </div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">{t.deadline ? formatDate(t.deadline) : '—'}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Панель действий */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 animate-slideUp" style={{ animationDelay: '0.2s' }}>

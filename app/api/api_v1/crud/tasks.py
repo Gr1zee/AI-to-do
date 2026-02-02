@@ -3,6 +3,8 @@ from sqlalchemy import select
 from typing import Sequence
 from app.models import Task
 from app.schemas.task import TaskCreate
+from datetime import date
+from sqlalchemy import func
 
 
 async def get_project_tasks(session: AsyncSession, project_id: int) -> Sequence[Task]:
@@ -14,6 +16,15 @@ async def get_project_tasks(session: AsyncSession, project_id: int) -> Sequence[
 
 async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
     stmt = select(Task).order_by(Task.id)
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_today_tasks_for_user(session: AsyncSession, user_id: int) -> Sequence[Task]:
+    """Получить задачи пользователя, у которых дедлайн сегодня (по дате)."""
+    today = date.today()
+    # compare DATE(deadline) == today
+    stmt = select(Task).where(Task.user_id == user_id, func.date(Task.deadline) == today).order_by(Task.deadline)
     result = await session.scalars(stmt)
     return result.all()
 

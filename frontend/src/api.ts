@@ -97,6 +97,10 @@ export const tasksApi = {
     return apiClient.get(`/projects/${projectId}/tasks`);
   },
 
+  getToday() {
+    return apiClient.get(`/tasks/today`);
+  },
+
   create(projectId: number, task: { title: string; description?: string; status?: string; priority?: string; deadline?: string }) {
     return apiClient.post(`/projects/${projectId}/tasks`, task);
   },
