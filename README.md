@@ -129,35 +129,6 @@ npm run dev
 
 Приложение будет доступно на `http://localhost:5173`
 
-## 📁 Структура проекта
-
-```
-AI-to-do/
-├── app/                    # Backend (FastAPI)
-│   ├── api/               # API эндпоинты
-│   │   └── api_v1/       # API v1
-│   │       ├── crud/     # CRUD операции
-│   │       ├── auth.py   # Аутентификация
-│   │       ├── projects.py
-│   │       ├── tasks.py
-│   │       └── users.py
-│   ├── auth/             # Утилиты аутентификации
-│   ├── core/             # Конфигурация
-│   ├── models/           # SQLAlchemy модели
-│   └── schemas/          # Pydantic схемы
-├── alembic/              # Миграции БД
-├── frontend/             # Frontend (React)
-│   ├── src/
-│   │   ├── components/   # UI компоненты
-│   │   ├── context/      # React контексты
-│   │   ├── pages/        # Страницы
-│   │   └── utils/        # Утилиты
-│   └── public/
-├── docker-compose.yml    # Docker конфигурация
-├── pyproject.toml        # Python зависимости
-└── README.md
-```
-
 ## 📊 API Эндпоинты
 
 ### Аутентификация
