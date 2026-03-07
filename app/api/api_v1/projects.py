@@ -41,18 +41,20 @@ async def get_projects(
 ):
     """Получить все проекты пользователя (свои + где участник)"""
     projects = await get_all_projects(session=session, user_id=current_user.id)
-    
+
     # Добавляем email владельца для каждого проекта
     result = []
     for project in projects:
         owner = await get_user_by_id(session, project.user_id)
-        result.append({
-            "id": project.id,
-            "name": project.name,
-            "description": project.description,
-            "user_id": project.user_id,
-            "owner_email": owner.email if owner else None,
-        })
+        result.append(
+            {
+                "id": project.id,
+                "name": project.name,
+                "description": project.description,
+                "user_id": project.user_id,
+                "owner_email": owner.email if owner else None,
+            }
+        )
     return result
 
 
@@ -106,14 +108,14 @@ async def add_project_member(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only project owner can add members",
         )
-    
+
     # Нельзя добавить себя
     if current_user.email == member_data.email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You cannot add yourself as a member",
         )
-    
+
     # Найти пользователя по email
     user_to_add = await get_user_by_email(session, member_data.email)
     if user_to_add is None:
@@ -121,7 +123,7 @@ async def add_project_member(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with email {member_data.email} not found",
         )
-    
+
     # Добавить участника
     try:
         member = await add_member(
@@ -151,21 +153,23 @@ async def list_project_members(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have access to this project",
         )
-    
+
     members = await get_members_crud(session=session, project_id=project_id)
-    
+
     # Преобразуем в формат ответа с email и user_id
     result = []
     for member in members:
         # Загружаем user через relationship или отдельный запрос
         user = await get_user_by_id(session, member.user_id)
-        result.append({
-            "id": member.id,
-            "user_id": member.user_id,
-            "email": user.email if user else "unknown",
-            "role": member.role,
-            "added_at": member.added_at,
-        })
+        result.append(
+            {
+                "id": member.id,
+                "user_id": member.user_id,
+                "email": user.email if user else "unknown",
+                "role": member.role,
+                "added_at": member.added_at,
+            }
+        )
     return result
 
 
@@ -183,14 +187,14 @@ async def remove_project_member(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only project owner can remove members",
         )
-    
+
     # Нельзя удалить себя (владельца)
     if current_user.id == user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You cannot remove yourself from the project",
         )
-    
+
     member = await remove_member(session, user_id=user_id, project_id=project_id)
     if member is None:
         raise HTTPException(
@@ -215,7 +219,7 @@ async def update_project_member_role(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only project owner can change member roles",
         )
-    
+
     member = await update_member_role(
         session, user_id=user_id, project_id=project_id, new_role=update_data.role.value
     )
@@ -231,6 +235,7 @@ async def update_project_member_role(
 async def get_user_by_id(session: AsyncSession, user_id: int):
     from app.models import User as UserModel
     from sqlalchemy import select
+
     stmt = select(UserModel).where(UserModel.id == user_id)
     result = await session.scalars(stmt)
     return result.first()

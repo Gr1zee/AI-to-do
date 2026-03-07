@@ -13,9 +13,10 @@ async def get_all_projects(session: AsyncSession, user_id: int) -> Sequence[Proj
             or_(
                 Project.user_id == user_id,  # владелец
                 Project.id.in_(  # участник
-                    select(ProjectMember.project_id)
-                    .where(ProjectMember.user_id == user_id)
-                )
+                    select(ProjectMember.project_id).where(
+                        ProjectMember.user_id == user_id
+                    )
+                ),
             )
         )
         .order_by(Project.id)
@@ -50,18 +51,14 @@ async def get_project_by_id(
     session: AsyncSession, project_id: int, user_id: int
 ) -> Project | None:
     """Получить проект по ID с проверкой прав доступа (владелец или участник)"""
-    stmt = (
-        select(Project)
-        .where(
-            Project.id == project_id,
-            or_(
-                Project.user_id == user_id,  # владелец
-                Project.id.in_(  # участник
-                    select(ProjectMember.project_id)
-                    .where(ProjectMember.user_id == user_id)
-                )
-            )
-        )
+    stmt = select(Project).where(
+        Project.id == project_id,
+        or_(
+            Project.user_id == user_id,  # владелец
+            Project.id.in_(  # участник
+                select(ProjectMember.project_id).where(ProjectMember.user_id == user_id)
+            ),
+        ),
     )
     result = await session.scalars(stmt)
     return result.first()

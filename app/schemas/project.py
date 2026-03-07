@@ -27,11 +27,13 @@ class Project(ProjectBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
+
 class ProjectMemberCreate(BaseModel):
     email: EmailStr
     role: ProjectRole
 
     model_config = {"from_attributes": True}
+
 
 class ProjectMemberRead(BaseModel):
     id: int
@@ -42,10 +44,12 @@ class ProjectMemberRead(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
 class ProjectMemberUpdate(BaseModel):
     role: ProjectRole
 
     model_config = {"from_attributes": True}
+
 
 class ProjectMemberDelete(BaseModel):
     email: EmailStr

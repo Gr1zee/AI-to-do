@@ -20,11 +20,17 @@ async def get_all_tasks(session: AsyncSession) -> Sequence[Task]:
     return result.all()
 
 
-async def get_today_tasks_for_user(session: AsyncSession, user_id: int) -> Sequence[Task]:
+async def get_today_tasks_for_user(
+    session: AsyncSession, user_id: int
+) -> Sequence[Task]:
     """Получить задачи пользователя, у которых дедлайн сегодня (по дате)."""
     today = date.today()
     # compare DATE(deadline) == today
-    stmt = select(Task).where(Task.user_id == user_id, func.date(Task.deadline) == today).order_by(Task.deadline)
+    stmt = (
+        select(Task)
+        .where(Task.user_id == user_id, func.date(Task.deadline) == today)
+        .order_by(Task.deadline)
+    )
     result = await session.scalars(stmt)
     return result.all()
 
