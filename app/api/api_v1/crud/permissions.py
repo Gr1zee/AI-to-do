@@ -32,15 +32,14 @@ async def get_user_role(
         return None
     if project.user_id == user_id:
         return "owner"
-    
+
     # Проверяем в project_members
     stmt = select(ProjectMember).where(
-        ProjectMember.project_id == project_id,
-        ProjectMember.user_id == user_id
+        ProjectMember.project_id == project_id, ProjectMember.user_id == user_id
     )
     result = await session.scalars(stmt)
     project_member = result.first()
-    
+
     return project_member.role if project_member else None
 
 

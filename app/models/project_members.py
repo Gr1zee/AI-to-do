@@ -22,7 +22,9 @@ class ProjectMember(Base):
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    role: Mapped[ProjectRole] = mapped_column(String(20), default=ProjectRole.VIEWER.value)
+    role: Mapped[ProjectRole] = mapped_column(
+        String(20), default=ProjectRole.VIEWER.value
+    )
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

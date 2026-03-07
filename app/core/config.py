@@ -28,9 +28,22 @@ class DataBaseConfig(BaseModel):
     }
 
 
+class RedisConfig(BaseModel):
+    host: str = "localhost"
+    port: int = 6379
+    db: int = 0
+    password: str | None = None
+
+    @property
+    def url(self) -> str:
+        if self.password:
+            return f"redis://:{self.password}@{self.host}:{self.port}/{self.db}"
+        return f"redis://{self.host}:{self.port}/{self.db}"
+
+
 class AuthJWT(BaseModel):
-    private_key_path: Path = "jwt-private.pem" # type: ignore
-    public_key_path: Path = "jwt-public.pem" # type: ignore
+    private_key_path: Path = "jwt-private.pem"  # type: ignore
+    public_key_path: Path = "jwt-public.pem"  # type: ignore
     algorithm: str = "RS256"
     access_token_expire_minutes: int = 60
 
@@ -45,6 +58,7 @@ class Settings(BaseSettings):
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
     db: DataBaseConfig
+    redis: RedisConfig = RedisConfig()
     groq_api: str
 
     auth_jwt: AuthJWT = AuthJWT()

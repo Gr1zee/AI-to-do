@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis
 
-
-router = APIRouter(prefix="/projects", tags=["Tasks"])
 from app.api.api_v1.crud.tasks import (
     get_project_tasks,
     create_task,
@@ -15,6 +14,11 @@ from app.schemas.task import TaskRead, TaskCreate, TaskUpdate
 from typing import Annotated
 from app.schemas.user import User
 from app.api.api_v1.crud.auth import get_current_auth_user
+from app.core.redis import get_redis
+
+import json
+
+router = APIRouter(prefix="/projects", tags=["Tasks"])
 
 
 async def get_current_project(
@@ -36,13 +40,25 @@ async def get_tasks(
     project_id: int = Path(..., gt=0),
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)] = None,
     current_user: User = Depends(get_current_auth_user),
+    redis: Redis = Depends(get_redis),
 ):
     """Получить все задачи проекта"""
     # Проверяем, что проект принадлежит пользователю
     await get_current_project(
         project_id=project_id, session=session, current_user=current_user
     )
+
+    # Попытка получить из кэша
+    cache_key = f"tasks:project:{project_id}:user:{current_user.id}"
+    cached_tasks = await redis.get(cache_key)
+    if cached_tasks:
+        return json.loads(cached_tasks)
+
+    # Получить из БД
     tasks = await get_project_tasks(session=session, project_id=project_id)
+
+    # Сохранить в кэш на 5 минут
+    await redis.setex(cache_key, 300, json.dumps([task.dict() for task in tasks]))
     return tasks
 
 
@@ -52,6 +68,7 @@ async def create_task_endpoint(
     task_create: TaskCreate = None,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)] = None,
     current_user: User = Depends(get_current_auth_user),
+    redis: Redis = Depends(get_redis),
 ):
     """Создать новую задачу в проекте"""
     # Проверяем, что проект принадлежит пользователю
@@ -64,6 +81,11 @@ async def create_task_endpoint(
         user_id=current_user.id,
         project_id=project_id,
     )
+
+    # Инвалидировать кэш
+    cache_key = f"tasks:project:{project_id}:user:{current_user.id}"
+    await redis.delete(cache_key)
+
     return task
 
 
@@ -73,6 +95,7 @@ async def delete_task_endpoint(
     task_id: int = Path(..., gt=0),
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)] = None,
     current_user: User = Depends(get_current_auth_user),
+    redis: Redis = Depends(get_redis),
 ):
     """Удалить задачу"""
     # Проверяем, что проект принадлежит пользователю
@@ -84,6 +107,11 @@ async def delete_task_endpoint(
         is None
     ):
         raise HTTPException(status_code=404, detail="Task not found")
+
+    # Инвалидировать кэш
+    cache_key = f"tasks:project:{project_id}:user:{current_user.id}"
+    await redis.delete(cache_key)
+
     return {"detail": "Task deleted successfully"}
 
 
@@ -94,6 +122,7 @@ async def update_task_endpoint(
     task_update: TaskUpdate = None,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)] = None,
     current_user: User = Depends(get_current_auth_user),
+    redis: Redis = Depends(get_redis),
 ):
     """Обновить задачу"""
     # Проверяем, что проект принадлежит пользователю
@@ -108,4 +137,9 @@ async def update_task_endpoint(
     )
     if not updated_task:
         raise HTTPException(status_code=404, detail="Task not found")
+
+    # Инвалидировать кэш
+    cache_key = f"tasks:project:{project_id}:user:{current_user.id}"
+    await redis.delete(cache_key)
+
     return updated_task
