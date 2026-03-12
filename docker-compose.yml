@@ -1,5 +1,21 @@
 services:
 
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-todo-web:latest
+    environment:
+      DB__URL: postgresql+asyncpg://user:password@pg:5432/ai_todo
+      REDIS__HOST: redis
+      GROQ_API: "https://api.example.com"
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pg
+      - redis
+
   pg:
     image: postgres
     environment:
